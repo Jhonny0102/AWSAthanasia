@@ -14,12 +14,23 @@ namespace Athanasia.Controllers
         private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
         private ServiceCacheRedis serviceRedis;
+        private ServiceAWSCache awsServiceRedis;
 
-        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceCacheRedis serviceRedis)
+        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceCacheRedis serviceRedis, ServiceAWSCache awsServiceRedis)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
             this.serviceRedis = serviceRedis;
+            this.awsServiceRedis = awsServiceRedis;
+        }
+
+        public async Task<IActionResult> SeleccionarFavorito(int idproducto)
+        {
+
+            ProductoView libro = await this.repo.GetProductoByIdAsync(idproducto);
+            await this.awsServiceRedis.AddLibroFavoritoAsync(libro);
+            ViewData["MENSAJE"] = "Se ha agregado con elastic aws";
+            return RedirectToAction("Index");
         }
 
         public async Task<ActionResult> Index(int? posicion, string? busqueda)

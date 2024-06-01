@@ -40,6 +40,14 @@ BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
 builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
 builder.Services.AddTransient<ServiceStorageBlobs>();
 builder.Services.AddTransient<ServiceCacheRedis>();
+//
+builder.Services.AddTransient<ServiceAWSCache>();
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "cache-proyecto-aws.uk9dp8.ng.0001.use1.cache.amazonaws.com:6379";
+    options.InstanceName = "cache-proyecto-aws";
+});
+//
 builder.Services.AddTransient<HelperPathProvider>();
 builder.Services.AddTransient<HelperMails>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));

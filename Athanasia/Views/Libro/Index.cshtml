@@ -69,10 +69,11 @@
                     </div>
 
                     <div class="d-flex justify-content-between mt-auto">
-                        <div id="@libro.IdProducto">
+@*                         <div id="@libro.IdProducto">
                             <button class="btn btn-secondary d-flex flex-column justify-content-center align-items-center" value="@libro.IdProducto">
                             </button>
-                        </div>
+                        </div> *@
+                        <a asp-controller="Libro" asp-action="SeleccionarFavorito" asp-route-idproducto="@libro.IdProducto">Favoritos</a>
                         <a asp-controller="Libro" asp-action="Detalles" asp-route-idproducto="@libro.IdProducto" class="btn btn-primary">Detalles</a>
                     </div>
                 </div>
@@ -108,4 +109,9 @@
             </svg>
         </a>
     </div>
+</div>
+<div>
+    <h1 style="color:red">
+        @ViewData["MENSAJE"]
+    </h1>
 </div>
