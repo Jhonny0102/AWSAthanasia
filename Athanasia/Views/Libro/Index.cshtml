@@ -3,7 +3,7 @@
     int posicion = (int)ViewData["POSICION"];
     int paginas = (int)ViewData["PAGINAS"];
     string busqueda = ViewData["BUSQUEDA"].ToString();
-    string urlOrigen = helperPaths.GetStorageBlob("portadas");
+    string urlOrigen = keysModel.bucket;
 }
 @section scripts {
     <script>

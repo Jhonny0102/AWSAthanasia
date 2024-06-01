@@ -1,5 +1,6 @@
 using Athanasia.Data;
 using Athanasia.Helpers;
+using Athanasia.Models.Util;
 using Athanasia.Repositories;
 using Athanasia.Services;
 using Azure.Security.KeyVault.Secrets;
@@ -7,8 +8,16 @@ using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+//
+string jsonSecrets = await
+    HelperSecretManager.GetSecretsAsync();
+KeysModel keysModel =
+    JsonConvert.DeserializeObject<KeysModel>(jsonSecrets);
+builder.Services.AddSingleton<KeysModel>(x => keysModel);
+//
 builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(options =>
@@ -30,22 +39,28 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 
-builder.Services.AddAzureClients(factory =>
-{
-    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
-});
-SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
-KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
-BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
-builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
-builder.Services.AddTransient<ServiceStorageBlobs>();
+//builder.Services.AddAzureClients(factory =>
+//{
+//    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
+//});
+//SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
+//KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
+//BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
+//builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+//builder.Services.AddTransient<ServiceStorageBlobs>();
+
 builder.Services.AddTransient<ServiceCacheRedis>();
 //
 builder.Services.AddTransient<ServiceAWSCache>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = "cache-proyecto-aws.uk9dp8.ng.0001.use1.cache.amazonaws.com:6379";
-    options.InstanceName = "cache-proyecto-aws";
+    options.InstanceName = "ElastiCacheExample";
+    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
+    {
+        EndPoints = { "cache-proyecto-aws.uk9dp8.ng.0001.use1.cache.amazonaws.com:6379" },
+        AbortOnConnectFail = false
+    };
 });
 //
 builder.Services.AddTransient<HelperPathProvider>();
