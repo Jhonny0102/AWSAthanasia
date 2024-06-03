@@ -58,10 +58,10 @@ namespace Athanasia.Helpers
             return urlPath;
         }
 
-        public string GetStorageBlob(string container)
-        {
-            return this.storage + container + "/";
-        }
+        //public string GetStorageBlob(string container)
+        //{
+        //    return this.storage + container + "/";
+        //}
 
         public string GetStaticFiles(FoldersImages folder)
         {

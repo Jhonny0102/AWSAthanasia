@@ -43,18 +43,18 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 
-//builder.Services.AddAzureClients(factory =>
-//{
-//    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
-//});
-//SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
-//KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
-//BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
-//builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
-//builder.Services.AddTransient<ServiceStorageBlobs>();
+builder.Services.AddAzureClients(factory =>
+{
+    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
+});
+SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
+KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
+BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
+builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+builder.Services.AddTransient<ServiceStorageBlobs>();
 
-//builder.Services.AddTransient<ServiceCacheRedis>();
-//
+builder.Services.AddTransient<ServiceCacheRedis>();
+
 builder.Services.AddTransient<ServiceAWSCache>();
 builder.Services.AddStackExchangeRedisCache(options =>
 {
