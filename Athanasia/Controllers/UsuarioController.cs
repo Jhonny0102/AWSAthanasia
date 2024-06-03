@@ -18,15 +18,15 @@ namespace Athanasia.Controllers
     {
         private IRepositoryAthanasia repo;
         private HelperMails helperMail;
-        private HelperPathProvider helperPathProvider;
-        private ServiceStorageBlobs serviceStorageBlobs;
+        //private HelperPathProvider helperPathProvider;
+        //private ServiceStorageBlobs serviceStorageBlobs;
 
         public UsuarioController(IRepositoryAthanasia repo, HelperMails helperMail, HelperPathProvider helperPathProvider, ServiceStorageBlobs serviceStorageBlobs)
         {
             this.repo = repo;
             this.helperMail = helperMail;
-            this.helperPathProvider = helperPathProvider;
-            this.serviceStorageBlobs = serviceStorageBlobs;
+            //this.helperPathProvider = helperPathProvider;
+            //this.serviceStorageBlobs = serviceStorageBlobs;
         }
 
         public IActionResult Terminos()
@@ -57,11 +57,11 @@ namespace Athanasia.Controllers
                 return View();
             }
             Usuario usuario = await this.repo.RegistrarUsuarioAsync(nombre, apellido, email, password);
-            string serverUrl = this.helperPathProvider.MapUrlServerPath();
-            serverUrl = serverUrl + "/Managed/Login?token=" + usuario.Token;
-            string mensaje = "<h3>Usuario registrado<h3>";
-            mensaje += "<p>Puede activar su cuenta pulsando el siguiente enlace:</p>";
-            mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
+            //string serverUrl = this.helperPathProvider.MapUrlServerPath();
+            //serverUrl = serverUrl + "/Managed/Login?token=" + usuario.Token;
+            //string mensaje = "<h3>Usuario registrado<h3>";
+            //mensaje += "<p>Puede activar su cuenta pulsando el siguiente enlace:</p>";
+            //mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
             //try
             //{
             //    await this.helperMail.SendMailAsync(email, "Activación cuenta[NO REPLY]", mensaje);
@@ -74,7 +74,7 @@ namespace Athanasia.Controllers
             //    //await this.repo.DeleteUsuarioAsync(usuario.IdUsuario);
             //}
             ViewData["ERROR"] = "Correo bloqueado";
-            ViewData["URL"] = serverUrl;
+            //ViewData["URL"] = serverUrl;
             return View();
         }
 
@@ -107,7 +107,7 @@ namespace Athanasia.Controllers
                 //    await fichero.CopyToAsync(stream);
                 //}
                 imagen = fichero.FileName;
-                this.serviceStorageBlobs.UploadBlobAsync("usuarios", imagen,fichero.OpenReadStream());
+                //this.serviceStorageBlobs.UploadBlobAsync("usuarios", imagen,fichero.OpenReadStream());
             }
             await this.repo.UpdateUsuarioAsync(idusuario, nombre, apellido, email, imagen);
             return RedirectToAction("Logout", "Managed");
@@ -126,11 +126,11 @@ namespace Athanasia.Controllers
             string email = HttpContext.User.FindFirst(ClaimTypes.Email).Value;
             int idusuario = int.Parse(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value);
             Usuario usuario = await this.repo.UpdateUsuarioTokenAsync(idusuario);
-            string serverUrl = this.helperPathProvider.MapUrlServerPath();
-            serverUrl = serverUrl + "/Usuario/CambioPassword?token=" + usuario.Token;
-            string mensaje = "<h3>Cambio de contraseña<h3>";
-            mensaje += "<p>Para cambiar de contraseña pulse en el siguiente enlace:</p>";
-            mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
+            //string serverUrl = this.helperPathProvider.MapUrlServerPath();
+            //serverUrl = serverUrl + "/Usuario/CambioPassword?token=" + usuario.Token;
+            //string mensaje = "<h3>Cambio de contraseña<h3>";
+            //mensaje += "<p>Para cambiar de contraseña pulse en el siguiente enlace:</p>";
+            //mensaje += "<a href='" + serverUrl + "'>" + serverUrl + "</a>";
             //try
             //{
             //    await this.helperMail.SendMailAsync(email, "Cambio contraseña[NO REPLY]", mensaje);
@@ -141,7 +141,7 @@ namespace Athanasia.Controllers
             //    ViewData["MENSAJE"] = "Error al enviar correo";
             //}
             ViewData["MENSAJE"] = "Error al enviar correo";
-            ViewData["URL"] = serverUrl;
+            //ViewData["URL"] = serverUrl;
             return View("Perfil");
         }
 
