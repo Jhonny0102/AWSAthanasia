@@ -1,4 +1,5 @@
-﻿using Athanasia.Models.Views;
+﻿using Amazon.Runtime.Internal.Util;
+using Athanasia.Models.Views;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
@@ -13,10 +14,9 @@ namespace Athanasia.Services
             this.cache = cache;
         }
 
-        public async Task<List<ProductoView>> GetLibrosFavoritosAsync()
+        public async Task<List<ProductoSimpleView>> GetLibrosFavoritosAsync()
         {
-            //ALMACENAREMOS UNA COLECCION DE COCHES EN FORMATO JSON
-            //LAS KEYS DEBEN SER UNICAS PARA CADA USER
+
             string jsonLibros =
                 await this.cache.GetStringAsync("librosfavoritos");
             if (jsonLibros == null)
@@ -25,33 +25,57 @@ namespace Athanasia.Services
             }
             else
             {
-                List<ProductoView> cars = JsonConvert.DeserializeObject<List<ProductoView>>(jsonLibros);
+                List<ProductoSimpleView> cars = JsonConvert.DeserializeObject<List<ProductoSimpleView>>(jsonLibros);
                 return cars;
             }
         }
 
-        public async Task AddLibroFavoritoAsync(ProductoView libro)
+        public async Task AddLibroFavoritoAsync(ProductoSimpleView libro)
         {
-            List<ProductoView> libros = await this.GetLibrosFavoritosAsync();
-            //SI NO EXISTEN COCHES FAVORITOS TODAVIA, CREAMOS 
-            //LA COLECCION
+            List<ProductoSimpleView> libros = await this.GetLibrosFavoritosAsync();
+
             if (libros == null)
             {
-                libros = new List<ProductoView>();
+                libros = new List<ProductoSimpleView>();
             }
-            //AÑADIMOS EL NUEVO COCHE A LA COLECCION
+
             libros.Add(libro);
-            //SERIALIZAMOS A JSON LA COLECCION
+
             string jsonLibros = JsonConvert.SerializeObject(libros);
             DistributedCacheEntryOptions options =
                 new DistributedCacheEntryOptions
                 {
                     SlidingExpiration = TimeSpan.FromMinutes(30)
                 };
-            //ALMACENAMOS LA COLECCION DENTRO DE CACHE REDIS
-            //INDICAREMOS QUE LOS DATOS DURARAN 30 MINUTOS
+
             await this.cache.SetStringAsync("librosfavoritos"
                 , jsonLibros, options);
+        }
+
+        public async Task DeleteCocheFavoritoAsync(int idlibro)
+        {
+            List<ProductoSimpleView> libros = await this.GetLibrosFavoritosAsync();
+            if (libros != null)
+            {
+                ProductoSimpleView libroEliminar = libros.FirstOrDefault(x => x.IdLibro == idlibro);
+                libros.Remove(libroEliminar);
+                if (libros.Count == 0)
+                {
+                    await this.cache.RemoveAsync("librosfavoritos");
+                }
+                else
+                {
+                    string jsonLibros = JsonConvert.SerializeObject(libros);
+                    DistributedCacheEntryOptions options =
+                        new DistributedCacheEntryOptions
+                        {
+                            SlidingExpiration = TimeSpan.FromMinutes(30)
+                        };
+                    await this.cache.SetStringAsync("librosfavoritos", jsonLibros, options);
+                }
+
+            }
+
         }
     }
 }

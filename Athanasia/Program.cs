@@ -12,11 +12,15 @@ using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 //
-string jsonSecrets = await
-    HelperSecretManager.GetSecretsAsync();
-KeysModel keysModel =
-    JsonConvert.DeserializeObject<KeysModel>(jsonSecrets);
-builder.Services.AddSingleton<KeysModel>(x => keysModel);
+string jsonSecrets = await 
+
+    HelperSecretManager.GetSecretsAsync(); 
+
+KeysModel keysModel =  
+
+    JsonConvert.DeserializeObject<KeysModel>(jsonSecrets); 
+
+builder.Services.AddSingleton<KeysModel>(x => keysModel); 
 //
 builder.Services.AddAntiforgery();
 builder.Services.AddHttpContextAccessor();
@@ -39,17 +43,17 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 
-builder.Services.AddAzureClients(factory =>
-{
-    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
-});
-SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
-KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
-BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
-builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
-builder.Services.AddTransient<ServiceStorageBlobs>();
+//builder.Services.AddAzureClients(factory =>
+//{
+//    factory.AddSecretClient(builder.Configuration.GetSection("KeyVault"));
+//});
+//SecretClient secretClient = builder.Services.BuildServiceProvider().GetService<SecretClient>();
+//KeyVaultSecret storagekey = await secretClient.GetSecretAsync("StorageAccount");
+//BlobServiceClient blobServiceClient = new BlobServiceClient(storagekey.Value);
+//builder.Services.AddTransient<BlobServiceClient>(x => blobServiceClient);
+//builder.Services.AddTransient<ServiceStorageBlobs>();
 
-builder.Services.AddTransient<ServiceCacheRedis>();
+//builder.Services.AddTransient<ServiceCacheRedis>();
 //
 builder.Services.AddTransient<ServiceAWSCache>();
 builder.Services.AddStackExchangeRedisCache(options =>

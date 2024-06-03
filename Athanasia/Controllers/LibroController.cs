@@ -13,22 +13,22 @@ namespace Athanasia.Controllers
     {
         private IRepositoryAthanasia repo;
         private IMemoryCache memoryCache;
-        private ServiceCacheRedis serviceRedis;
-        private ServiceAWSCache awsServiceRedis;
+        //private ServiceCacheRedis serviceRedis;
+        private ServiceAWSCache serviceRedis;
 
-        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceCacheRedis serviceRedis, ServiceAWSCache awsServiceRedis)
+        public LibroController(IRepositoryAthanasia repo, IMemoryCache memoryCache, ServiceAWSCache serviceRedis)
         {
             this.repo = repo;
             this.memoryCache = memoryCache;
+            //this.serviceRedis = serviceRedis;
             this.serviceRedis = serviceRedis;
-            this.awsServiceRedis = awsServiceRedis;
         }
 
         public async Task<IActionResult> SeleccionarFavorito(int idproducto)
         {
 
-            ProductoView libro = await this.repo.GetProductoByIdAsync(idproducto);
-            await this.awsServiceRedis.AddLibroFavoritoAsync(libro);
+            ProductoSimpleView libro = await this.repo.GetProductoSimpleByIdAsync(idproducto); //Metodo devuelve un objeto ProductView
+            await this.serviceRedis.AddLibroFavoritoAsync(libro);
             ViewData["MENSAJE"] = "Se ha agregado con elastic aws";
             return RedirectToAction("Index");
         }
@@ -94,11 +94,11 @@ namespace Athanasia.Controllers
             else
             {
                 string idusuario = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                List<ProductoSimpleView> productos = await this.serviceRedis.GetProductosFavoritosAsync(idusuario);
+                List<ProductoSimpleView> productos = await this.serviceRedis.GetLibrosFavoritosAsync();
                 if (agregar == true)
                 {
                     ProductoSimpleView producto = await this.repo.GetProductoSimpleByIdAsync(idproducto);
-                    await this.serviceRedis.AddProductoFavoritoAsync(idusuario, producto);
+                    await this.serviceRedis.AddLibroFavoritoAsync(producto);
                 }
             }
             ViewData["IDPRODUCTO"] = idproducto;
